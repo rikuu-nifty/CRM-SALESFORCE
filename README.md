@@ -60,3 +60,9 @@ Customer feedback scores
 
 Retention metrics
 
+
+Milestone 1: Salesforce Account Setup
+In this milestone, I began my Salesforce journey by learning the basics of what Salesforce is and how it supports businesses through its powerful CRM platform. I explored its core purpose as a customer success platform that helps organizations sell, market, service, and analyze effectively. As part of the process, I created my own Salesforce Developer Account by visiting the official sign-up page at developer.salesforce.com. I filled out the required information including my name, email, job title (Developer), my college name as the company, and selected India as my country.
+
+After completing the sign-up form, I submitted it and waited for the verification email. Once I received the email, I clicked on the “Verify Account” button, set my password, chose a security question, and successfully activated my Salesforce account. This redirected me to my Salesforce setup page, where I can now begin exploring and building solutions. This milestone served as my official onboarding into the Salesforce environment and laid the groundwork for all future activities in this project.
+
