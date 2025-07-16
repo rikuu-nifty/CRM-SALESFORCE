@@ -134,14 +134,121 @@ To uphold data integrity and enforce business-specific rules across the Tours an
 On the `Employee__c` object, validation logic ensures that employees designated as guides must have at least one language selected, supporting complete and accurate role configuration. Additionally, the `Booking__c` object includes a rule that mandates all newly created booking records to default to a "Pending" status. These validation rules collectively reduce the risk of incorrect data entry and help maintain consistency and reliability across all records in the CRM.
 ![123](./ScreenshotDocumentation/Milestone6ValidationRules.PNG)
 
+## Milestone 7: Approval Process
+To implement an approval workflow for booking cancellations, I first set up the necessary prerequisites, including user profiles, roles, and users. I created a classic email template to notify the Travel Agent Manager when a cancellation request is submitted, followed by two additional templates for approval and rejection responses. These templates personalize communication with customers based on the outcome.
 
+The approval process was configured on the `Booking__c` object with criteria that trigger the workflow only when the booking status is set to "Cancelled" and the cancel confirmation checkbox is selected. The approval request is routed to the Travel Agent Manager, and the process displays essential booking fields such as the booking number, travel package, and cancellation reason.
 
+Travel agents and booking owners are allowed to submit requests, which are then marked as "Pending." Upon approval, the system updates the approval status to "Approved" and sends a confirmation email to the customer. If rejected, the status reverts to "Confirmed," and a rejection email is sent. The process includes a single approval step and is now active, ensuring all cancellation requests are reviewed and resolved with clear communication.
 
+![123](./ScreenshotDocumentation/Milestone7ApprovalProcess1.PNG)
+![123](./ScreenshotDocumentation/Milestone7ApprovalProcess2.PNG)
 
+## Milestone 8: Flows
+To maintain data consistency and enforce booking constraints, I developed a Record-Triggered Flow on the `BookingGuest__c` object that prevents users from adding more guests than the number of travelers specified in a related booking. The flow is triggered during both record creation and updates. It begins by using a Get Records element to retrieve the associated `Booking__c` record along with its traveler count. A Decision element then evaluates whether the number of existing `BookingGuest__c` records already matches or exceeds the allowed number of travelers.
 
+If the condition is met, a Text Template named `ErrorMessageTemplate` is used to display a message stating: “Sorry, we can't add more guests because the maximum number of Travellers for this booking has already been reached.” This message is shown to the user via a Custom Error element directly on the record page. After activating the flow, the system now enforces guest limits effectively, supporting accurate record management and ensuring alignment with the CRM’s business rules.
 
+![123](./ScreenshotDocumentation/Milestone8Flows.PNG)
 
+## Milestone 9: Workflows
 
+To streamline post-travel engagement, I implemented a workflow rule on the `Booking__c` object that automatically assigns a follow-up task to the travel agent once a booking is marked as "Completed." This automation ensures consistent customer feedback collection. Within the Setup menu, I accessed the Workflow Rules section and created a new rule named "Follow-up Task After Booking Completion." The rule was set to run when records are created or edited, and it triggers specifically when the Booking Status field is set to "Completed."
+
+As part of the rule's actions, I configured a new task to be assigned to the booking owner. The task includes a subject line “Follow up for feedback,” and is scheduled to be due three days after the booking's "Travelling End Date." The task was given a status of "Not Started," a priority of "Normal," and contains instructions for the agent to reach out to the customer to gather feedback. After saving and activating the workflow rule, the system now supports automated follow-up reminders, enhancing customer relationship management and service quality.
+
+![123](./ScreenshotDocumentation/Milestone9Workflows.PNG)
+
+## Milestone 10: Process Builder
+
+To enhance efficiency in the Tours and Travels CRM, I created a Process Builder automation that automatically updates a booking’s status to "Confirmed" once its associated payment is marked as "Completed." The process, titled **Update Booking to Confirmed When Payment Completed**, was set up to trigger when records in the `BookingPayment__c` object are created or edited.
+
+Within the process, I defined the condition using the field `Payment_Status__c`, specifying that it must equal "Completed" using AND logic. Once this criterion is met, an immediate action is triggered to update the related `Booking__c` record. Specifically, the `Booking_Status__c` field is set to "Confirmed." After configuring and saving the process, I activated it to ensure that the system automatically updates booking statuses in real time, reducing the need for manual intervention and improving booking accuracy.
+
+![123](./ScreenshotDocumentation/Milestone10ProcessBuilder.PNG)
+
+## Milestone 11: Triggers
+
+As part of automating backend processes, I developed an Apex Trigger on the `Booking__c` object to handle post-insert actions. After logging into Salesforce and opening the Developer Console, I created a trigger named `BookingTrigger` that executes after a new booking record is inserted. The trigger delegates logic to a separate handler class, `BookingTriggerHandler`, for better maintainability.
+
+Within the handler class, I implemented a method to automatically create a corresponding `BookingPayment__c` record for each new booking. The payment record is initialized with a default status of "Pending" to reflect its initial state. Additionally, I created another method called `createBookingGuests` to dynamically generate guest records based on the value in the `Number_of_Travelers__c` field. The system inserts that number of `BookingGuest__c` records and labels them sequentially (e.g., Guest 1, Guest 2, etc.).
+
+With both features in place and tested, the trigger ensures that each new booking automatically generates its associated payment and guest records, reducing manual input and improving operational consistency across the CRM.
+
+![123](./ScreenshotDocumentation/Milestone11Triggers.PNG)
+
+## Milestone 12: Asynchronous Apex
+
+To support non-blocking performance and scalable background operations, I implemented three critical email notification processes using asynchronous Apex. First, I developed a `Future` method within the `BookingConfirmationEmailer` Apex class to send confirmation emails when a booking’s status is updated to “Confirmed.” This method is invoked by the modified `BookingTrigger`, which detects the relevant status change and passes the booking ID to the method.
+
+Next, I created a `Queueable` Apex class called `BookingReminderQueueable`, designed to send reminder emails to customers three days before their tour begins. This class is executed daily by a `Schedulable` Apex class named `BookingReminderScheduler`, which queries bookings scheduled exactly three days ahead and enqueues the reminder logic. The job is scheduled using a CRON expression to run every day at 6 AM.
+
+Lastly, I developed a `Batch` Apex class, `PaymentReminderBatch`, to notify customers about pending payments for bookings created the day before. The batch includes a `finish` method that alerts the system admin upon job completion. This batch job is managed by a separate `Schedulable` class, `SchedulePaymentReminderBatch`, and is configured to run each morning at 5 AM via the Salesforce UI Scheduler.
+
+This milestone ensures that key notifications—booking confirmations, tour reminders, and payment alerts—are automatically delivered on schedule, optimizing both customer experience and internal efficiency.
+![123](./ScreenshotDocumentation/Milestone12AsynchronousApex.PNG)
+
+# Phase 3: UI/UX Development & Customization
+During Phase 3, I concentrated on crafting a streamlined, responsive, and user-friendly interface for the Tours and Travels CRM system. This involved designing and implementing custom Lightning Web Components (LWCs) and configuring Lightning Pages to ensure a smooth experience across both desktop and mobile devices. I also set up user authentication features and used Salesforce Flows to support efficient navigation and automate user interactions within the interface.
+
+To enhance user accessibility and engagement, I customized record page layouts and leveraged dynamic forms with conditional visibility to show or hide fields based on record context. Reports and dashboards were personalized to deliver real-time insights tailored to each user role. Thorough testing was conducted across all UI components to validate responsiveness, functionality, and overall user experience.
+
+## Milestone 13: The Lightning App
+
+As part of Milestone 13, I developed a custom Lightning App called **"Tours & Travels CRM"** to provide users with a streamlined, centralized workspace. Through the App Manager in Salesforce Setup, I configured the app's branding by uploading a relevant logo and proceeded with default navigation and utility settings. I included all core objects essential to the CRM—such as `Customer_Info__c`, `TravelPackage__c`, `Booking__c`, `BookingPayment__c`, `BookingGuest__c`, `Employee__c`, `Feedback__c`, as well as `Tasks`, `Reports`, and `Dashboards`—to ensure comprehensive access to key functionalities.
+
+To finalize the configuration, I assigned the app to the System Administrator profile to enable full access and control. After saving and activating the setup, the Lightning App became fully functional, serving as a centralized hub for managing travel and customer operations within the CRM system.
+
+![123](./ScreenshotDocumentation/Milestone13TheLightningApp.PNG)
+
+## Milestone 14: Editing of Page Layouts
+
+This milestone focused on optimizing the page layouts of both standard and custom objects to improve usability and ensure a user-friendly experience within the Tours & Travels CRM. Through the Object Manager in Salesforce Setup, I modified the layout structure of key objects including `Customer_Info__c`, `BookingGuest__c`, `TravelPackage__c`, `Employee__c`, `Booking__c`, `BookingPayment__c`, and `Feedback__c`.
+
+Each layout was thoughtfully organized to prioritize essential fields by positioning them at the top of the record page, while less critical or supporting fields were grouped logically beneath. This approach enhances data visibility, reduces the likelihood of input errors, and aligns the interface with typical user workflows. Once adjustments were completed, the updated layouts were saved and applied to ensure consistency across the system. These improvements contribute to a more streamlined and efficient CRM interface for end users.
+
+![123](./ScreenshotDocumentation/Milestone14EditingofPageLayouts.PNG)
+
+## Milestone 15: Dynamic Forms 
+
+To enhance the user experience by displaying context-sensitive fields, I enabled Dynamic Forms for the `Booking__c` object in the Tours & Travels CRM. First, I accessed the Booking tab through the App Launcher and created a new booking record to use as a reference. After saving the record, I opened it and selected **Edit Page** from the gear icon menu to launch the Lightning App Builder.
+
+Inside the builder, I upgraded the Details section to Dynamic Forms by clicking **Upgrade Now**, choosing the existing Booking Page Layout, and completing the setup. With Dynamic Forms enabled, I configured field visibility rules to ensure that certain fields only appear based on specific conditions.
+
+For instance, the `Cancellation Date`, `Cancel Confirmation`, and `Approval Status` fields were set to display only when the Booking Status is marked as “Cancelled.” These filters were applied individually to ensure that each field responds dynamically to the booking's status.
+
+Once the visibility logic was configured, I saved the changes and activated the page by selecting **Org Default**. I also enabled the form for both desktop and mobile users to ensure consistency across devices. This setup allows users to interact with a cleaner and more relevant interface, reducing clutter and improving overall usability when managing booking records.
+![123](./ScreenshotDocumentation/Milestone15DynamicForms.PNG)
+
+## Milestone 16: Users
+
+Before creating users, it’s essential to complete the Profiles and Roles setup, as these define access levels and permissions. Once those configurations are in place, navigate to **Setup**, search for **Users** in the Quick Find box, and click on the **Users** section. Begin the process by selecting **New User** and entering the required information.
+
+For the first user, input the name **Michael Jackson**, along with an alias, a valid email address, and a unique username in the format `example@example.com`. Assign a nickname for easier identification and select the **Travel Agent Manager Role**. Choose **Salesforce Platform** as the User License and set the Profile to **Travel Agent Profile**. Once saved, continue creating additional users using the same process.
+
+Subsequent users should be assigned the **Travel Agent Role**, with the same license and profile settings. It’s recommended to create at least two users for each defined role to ensure role-based access is properly represented across the organization.
+
+![123](./ScreenshotDocumentation/Milestone16Users.PNG)
+
+## Milestone 17: Reports
+
+To begin configuring reports in the Tours & Travels CRM, I first accessed the Reports tab via the App Launcher and created a new report folder named **Revenue Folder**. After saving the folder, I navigated to the All Folders section, located the newly created folder, and configured sharing settings. View access was granted specifically to the **Travel Agent Manager** and **Finance Officer** roles, ensuring only relevant users could view financial reports.
+
+Prior to building the reports, I added at least 10 records per object in the CRM, ensuring all fields were populated for richer data analysis. For the **Booking** object in particular, I made sure to set the Booking Status to "Pending" where necessary to support specific report filters.
+
+The first report created was the **Monthly Revenue Report**, using the standard Booking report type. I selected fields like Booking Number, Customer, Booking Date, and Total Billing Amount, then applied filters to show only confirmed or completed bookings for the current month. To visualize revenue ranges, I used a bucket field on the Total Billing Amount, defining categories as Low (0–50,000), Medium (50,001–200,000), and High (>200,000). The report was grouped by Travel Package and Revenue Category, and displayed as a Pie Chart. It was saved in the Revenue Folder.
+
+Next, I created three additional key reports:
+
+- **Pending Payments Report**: Built using the "Booking Payments with Bookings" report type, this report filtered for Payment Status set to Pending and included relevant payment and customer fields. It was saved in the Revenue Folder.
+  
+- **Top Travel Packages Report**: Used the "Bookings with Travel Packages" type, grouped by package name, and summarized by booking count to reveal the most frequently booked packages. Sorted by descending count, it was saved under the same folder.
+  
+- **Employee Role Breakdown Report**: Focused on employee distribution, this report used the Employees report type and grouped records by Role, with a count summary to show the number of employees per role.
+
+Finally, I planned and created at least five more custom reports tailored to various business needs, supporting deeper insights into bookings, customer trends, operational performance, and service feedback. These reports collectively provide essential visibility and decision-making support within the CRM system.
+![123](./ScreenshotDocumentation/Milestone17Reports1.PNG)
+![123](./ScreenshotDocumentation/Milestone17Reports2.PNG)
 
 
 
