@@ -250,6 +250,63 @@ Finally, I planned and created at least five more custom reports tailored to var
 ![123](./ScreenshotDocumentation/Milestone17Reports1.PNG)
 ![123](./ScreenshotDocumentation/Milestone17Reports2.PNG)
 
+## Milestone 18: Dashboards
+
+To visualize key performance metrics in the Tours & Travels CRM, dashboards were created using prebuilt reports. The process began by navigating to the Dashboards tab and clicking “New Dashboard.” A dashboard titled **Tours & Travels Dashboard** was created and configured by adding components through the canvas interface. The first widget added was based on the **Monthly Revenue Report**, displayed as a **Pie Chart** with a maximum of 10 values shown. The subtitle was set to *Total payments completed Bookings*, and the **Dark Theme** was applied for visual contrast. This configuration was saved to preserve the layout.
+
+Three additional components were added using other reports from the Reports Milestone, each visualized using appropriate chart types such as bar graphs, line charts, or tables. These components provided distinct insights into areas like pending payments, popular travel packages, and employee performance, offering users a well-rounded view of business operations.
+
+To access the completed dashboard, users can open the App Launcher, search for the **Tours & Travels CRM** app, and navigate to the Dashboards tab. From there, they can select and interact with the Tours & Travels Dashboard, which displays at least four fully configured components.
+
+In addition to the main dashboard, two more dashboards were created using other reports from Activity 4. These dashboards focused on specialized views aligned with different roles—such as finance tracking or customer service trends—offering tailored insights across the organization.
+![123](./ScreenshotDocumentation/Milestone18Dashboards.PNG)
+
+## Milestone 19: Lightning Web Component Creation
+
+This milestone focused on enhancing the user interface of the Tours & Travels CRM by developing a dynamic Lightning Web Component (LWC) that allows users to view travel packages filtered by the country selected on the booking form. The goal was to provide real-time interactivity without requiring a page refresh.
+
+The backend logic was handled by creating an Apex controller named `TravelPackageController`, which included a method `getPackagesByCountry`. This method uses the `@AuraEnabled` annotation to enable server-side communication, returning a filtered list of travel packages based on the selected country.
+
+On the frontend, an LWC named `TravelPackageSelector` was developed using Lightning Studio tools. The component’s structure included an HTML template that featured a `lightning-combobox` for country selection and a section to display the resulting travel packages. In the JavaScript controller, the `handleCountryChange()` function was implemented to call the Apex method and render the results dynamically on the UI.
+
+The component’s metadata configuration (XML file) was updated to make it available on the App Page, Home Page, and Record Page. Once deployed, this LWC successfully provided real-time filtering of travel packages, improving usability and interactivity. This milestone demonstrated effective integration of Apex and LWC to deliver a responsive, intuitive user experience within the CRM.
+![123](./ScreenshotDocumentation/Milestone19LightningWebComponentCreation.PNG)
+
+## Milestone 20: Lightning App Page Creation
+To improve the overall user experience, I integrated a custom Lightning Web Component into a dedicated Lightning App Page. Using the Lightning App Builder from Setup, I created a new App Page titled "Travel Package Selector" and chose a single-region layout to maintain a clean and focused design. I added the `travelpackageselector` component to the layout, saved the configuration, and activated the page. The new app page was then linked to the Tours & Travels CRM app to ensure easy access. Finally, I confirmed its availability through the App Launcher. When opened, the page enables users to choose a country and instantly view the associated travel packages, enhancing both interactivity and data visibility within the CRM system.
+
+![123](./ScreenshotDocumentation/Milestone20LightningAppPageCreation.PNG)
+
+# Phase 4: Data Migration, Testing & Security
+This phase focused on importing legacy data into Salesforce with a strong emphasis on data quality and system reliability. I applied thorough validation rules to maintain data integrity and conducted extensive testing—including unit tests, integration tests, and user acceptance testing (UAT)—to verify that all records were migrated correctly and that system behavior met expectations. In parallel, I implemented essential security configurations such as role-based access, sharing settings, and field-level restrictions to protect sensitive information and ensure adherence to organizational security standards.
+
+## Milestone 21: Field History Tracking
+To maintain a clear audit trail of critical data changes within the Tours & Travels CRM, I configured Field History Tracking on key objects. For the `Booking__c` object, tracking was enabled for fields such as Number of Travelers, Booking Status, and TravelPackage, allowing any updates to these values to be recorded and visible in the History related list. Similarly, the `TravelPackage__c` object was set up to track changes in Price Per Person and Availability Status, ensuring that all modifications to pricing and availability are monitored over time. This configuration supports greater transparency and accountability by allowing users and administrators to review historical changes to essential booking and package data.
+![123](./ScreenshotDocumentation/Milestone21FieldHistoryTracking.PNG)
+
+## Milestone 22: Duplicate and Matching Rules
+To maintain clean and reliable customer data within the `Customer_Info__c` object, a Matching Rule was configured to identify duplicate records based on a combination of email and phone number fields. This rule, titled **"Unique Email and Phone Number Combination"**, ensures that any records with identical values in these fields are flagged. The "Match Blank Fields" setting was enabled to allow comparison even if one of the fields is left empty, increasing the rule's flexibility and detection accuracy.
+
+Following the creation of the matching rule, a Duplicate Rule named **"Unique Email and Phone"** was implemented to define how the system handles potential duplicates. This rule allows users to continue creating or editing records while providing a real-time warning message: *“Email and Phone must be Unique.”* The rule was linked to the previously created matching rule to ensure consistent behavior. Once saved and activated, these rules help enforce data quality standards while maintaining a smooth user experience during data entry.
+![123](./ScreenshotDocumentation/Milestone22DuplicateandMatchingRules.PNG)
+
+## Milestone 23: Profiles
+
+To enforce role-based access control in the Tours and Travels CRM, several custom profiles were configured by cloning base profiles such as “Standard Platform User” and “Salesforce Platform User.” Each profile was tailored to match the specific needs and responsibilities of the intended user type.
+
+The **Travel Agent Profile** was created by duplicating the Standard Platform User profile. After setting the default app to the Tours and Travels CRM, the agent was granted Create, Read, and Edit permissions for key objects like Bookings, Booking Guests, Booking Payments, Customer Info, and Travel Packages. Read-only access was applied to Employee and Feedback records. Session timeout was set to 2 hours, and password settings were adjusted to require a minimum length of 8 characters with no expiration policy.
+
+The **Tour Guide Profile**, based on the Salesforce Platform User template, was designed with restricted access. This profile only allows Read access to Bookings, Booking Guests, and Travel Packages, ensuring guides have visibility into essential records without edit privileges.
+
+The **Finance Officer Profile** was similarly derived from Salesforce Platform User and provided with full access to Bookings and Booking Payments, enabling financial management while restricting changes to Travel Packages and Employee data through view-only permissions.
+
+For marketing operations, the **Marketing Executive Profile** was granted full control over the Travel Package object to manage offerings and promotions. Read-only access was assigned to Bookings, Booking Guests, Customer Info, Employee, and Feedback objects to maintain visibility without editing capabilities.
+
+Lastly, the **Customer Service Rep Profile** focused on handling client feedback. This profile was configured with full permissions on the Feedback object and read-only access to Bookings, Customer Info, and Travel Packages. This setup supports customer engagement without granting unnecessary control over sales or operations data.
+
+These custom profiles helped ensure that every user role operates within defined access boundaries, promoting security, data integrity, and streamlined workflows.
+![123](./ScreenshotDocumentation/Milestone23Profiles.PNG)
+
 
 
 
