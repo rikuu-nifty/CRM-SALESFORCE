@@ -55,7 +55,95 @@ This phase focused on building the backend architecture of the Tours & Travels C
 
 To kick off my Salesforce journey, I created a Salesforce Developer Org to serve as the foundation for hands-on practice and project development. I started by registering at [developer.salesforce.com/signup](https://developer.salesforce.com/signup), where I filled in the required fields—using "Developer" for both job title and company name. After submitting the form, I received a verification email, which I confirmed to activate the account. I then set up my password and successfully logged in via [login.salesforce.com](https://login.salesforce.com). With this setup complete, my dedicated Salesforce Developer environment was ready for building and testing CRM solutions.
 
-![Screenshot](./Screenshot%20Documentation/1.png)
+![Milestone 1 - Salesforce Account](./ScreenshotDocumentation/Milestone1SalesforceAccount.PNG)
+
+## Milestone 2: Object Creation
+
+To establish the core data structure for the **Tours & Travels CRM**, seven custom objects were created to represent key business entities:
+
+- `Customer_Info__c`  
+- `Booking__c`  
+- `BookingGuest__c`  
+- `TravelPackage__c`  
+- `BookingPayment__c`  
+- `Employee__c`  
+- `Feedback__c`
+
+Each object was designed with primary fields and **lookup relationships** to accurately reflect real-world business logic. For instance, the `Booking__c` object is linked to both the `Customer_Info__c` and `TravelPackage__c` objects, establishing crucial connections between customers, bookings, and tour packages.
+
+This milestone strengthened my understanding of Salesforce’s **object-oriented architecture**. I learned that custom objects go beyond data storage—they define:
+- Data relationships between entities  
+- Automation logic (e.g., triggers and flows)  
+- User interface elements and behavior  
+By setting up these custom objects correctly, I laid a strong foundation for scalable development and CRM automation in later phases.
+
+![Milestone 2 - Object Creation](./ScreenshotDocumentation/Milestone2ObjectsCreation.PNG)
+
+## Milestone 3: Tabs Creation
+
+To enhance accessibility and navigation within the Salesforce interface, I created **custom tabs** for each of the core objects in the **Tours & Travels CRM** system.
+
+### Steps Taken:
+1. Navigated to `Setup`.
+2. Searched for **"Tabs"** using the Quick Find box.
+3. Selected the **Tabs** section under **User Interface**.
+4. Under **Custom Object Tabs**, clicked **New** to begin the process.
+
+For each tab:
+- Selected the relevant custom object (e.g., `Customer_Info__c`).
+- Chose a tab icon and color for visual representation.
+- Kept default visibility settings for user profiles.
+- Opted **not** to include the tab in apps by default but allowed it to appear in users' personal customizations.
+- Clicked **Save** to finalize creation.
+
+### Tabs Created for the Following Custom Objects:
+- `Customer_Info__c`
+- `Booking__c`
+- `BookingGuest__c`
+- `TravelPackage__c`
+- `BookingPayment__c`
+- `Employee__c`
+- `Feedback__c`
+![Milestone 3 - Tabs Creation](./ScreenshotDocumentation/Milestone3TabCreation.PNG)
+
+## Milestone 4: Fields & Relationships
+In this milestone, I focused on designing and implementing all essential fields and object relationships for the Tours & Travels CRM system. On the `Customer_Info__c` object, key fields such as `Email` were created using appropriate data types and configured to support search and reporting functionalities. A global picklist value set for `Country` was also defined and reused across various objects to maintain consistency and scalability.
+
+To maintain relational integrity, a lookup relationship was established from the `Booking__c` object to `Customer_Info__c`, ensuring that every booking could be directly associated with a customer. In addition, a formula field was created on the `BookingGuest__c` object to dynamically calculate and categorize guest age groups, improving personalization and segmentation.
+
+Picklist fields such as `Relation with Customer`, `Availability Status`, and `Payment Method` were added to capture critical business data. Multi-select picklists for fields like `Membership`, `Package Type`, and `Transportation Modes` enabled greater flexibility when defining travel offerings. For employee-related configurations, I added picklists for roles, departments, supported languages, and assigned regions. Location-specific fields like `Country` and `City` were tied to the global value sets, ensuring data consistency across all entries.
+
+All field types were thoughtfully selected to support both user input and system automation. This setup ensures accurate data collection, real-world workflow alignment, and a strong foundation for reporting, automation, and future enhancements in the CRM.
+
+![123](./ScreenshotDocumentation/Milestone4Fields&Relationships1.PNG)
+![123](./ScreenshotDocumentation/Milestone4Fields&Relationships2.PNG)
+![123](./ScreenshotDocumentation/Milestone4Fields&Relationships3.PNG)
+
+## Milestone 5: Field Dependencies
+To improve data accuracy and streamline user input across the CRM, I configured field dependencies between related picklist fields on key custom objects. On the `BookingGuest__c` object, a dependency was created between the `Country` and `City` fields. When a user selects a country, only cities relevant to that country become selectable, minimizing input errors and enhancing user experience.
+
+On the `Booking__c` object, I implemented a dependency between `Membership` and `Preferred Accommodation`. Depending on the membership tier selected (e.g., Basic, Gold, or VIP), the system dynamically filters accommodation choices such as hotels, resorts, or villas. This ensures that booking options remain aligned with customer entitlements and business rules.
+
+For the `Employee__c` object, I linked the `Department` field with the `Role` field, so that only appropriate roles—like Travel Agent, Finance Executive, or Tour Coordinator—appear under relevant departments such as Travel Operations, Finance, or Logistics. These dependencies help enforce logical consistency, reduce invalid entries, and simplify the user interface for data entry across the platform.
+![123](./ScreenshotDocumentation/Milestone5FieldDependencies.PNG)
+
+## Milestone 6: Validation Rules 
+
+To uphold data integrity and enforce business-specific rules across the Tours and Travels CRM, I implemented several validation rules on key custom objects. On the `Customer_Info__c` object, validations were added to ensure that phone numbers contain exactly 10 digits, email addresses follow the correct format, and birthdates cannot be set in the future. For the `BookingGuest__c` object, the system enforces that age values must be greater than zero, and email addresses are required based on the assigned guest role.
+
+On the `Employee__c` object, validation logic ensures that employees designated as guides must have at least one language selected, supporting complete and accurate role configuration. Additionally, the `Booking__c` object includes a rule that mandates all newly created booking records to default to a "Pending" status. These validation rules collectively reduce the risk of incorrect data entry and help maintain consistency and reliability across all records in the CRM.
+![123](./ScreenshotDocumentation/Milestone6ValidationRules.PNG)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
