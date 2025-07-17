@@ -307,9 +307,120 @@ Lastly, the **Customer Service Rep Profile** focused on handling client feedback
 These custom profiles helped ensure that every user role operates within defined access boundaries, promoting security, data integrity, and streamlined workflows.
 ![123](./ScreenshotDocumentation/Milestone23Profiles.PNG)
 
+## Milestone 24: Roles & Role Hierarchy
+
+To enforce proper data visibility and access control within the Tours & Travels CRM, a hierarchical role structure was configured in Salesforce. The hierarchy begins with the **Travel Agent Manager** role, positioned directly under the CEO. This role serves as the supervisory position for team members managing customer bookings. Beneath the Travel Agent Manager, two additional roles were defined: **Travel Agent**, responsible for handling day-to-day booking operations, and **Travel Tour Guide**, who assists with guided tours but requires limited access to booking data.
+
+To reflect broader organizational departments, three more roles were added directly under the CEO. These include the **Finance Officer**, responsible for managing financial records and payments; the **Marketing Executive**, who oversees promotional campaigns and travel package visibility; and the **Customer Service Representative**, who manages customer support and feedback.
+
+This structured role hierarchy enables Salesforce’s role-based sharing model, ensuring that data flows appropriately across teams—managers have visibility into their team's records, while access remains restricted based on job responsibilities. This configuration enhances both operational oversight and data security.
+
+![123](./ScreenshotDocumentation/Milestone24Roles&RoleHierarchy.PNG)
 
 
+## Milestone 25: Permission Set
 
+In this milestone, a custom Permission Set named **"Extra Permission For Travel Agent Manager"** was created to extend access privileges without altering users' base profile settings. This approach provides more flexibility in managing permissions while maintaining secure role-based access. The process began in the **Setup** menu by navigating to **Permission Sets** and creating a new set specifically for the Travel Agent Manager role.
+
+Within the new permission set, object-level access was configured by locating the `TravelPackage__c` object under **Object Settings**. Permissions were adjusted to grant full access — including Read, Edit, Create, and Delete — ensuring the Travel Agent Manager could manage travel packages independently of their profile limitations.
+
+Once configured, the permission set was assigned to the appropriate user through the **Manage Assignments** section. This enabled the designated Travel Agent Manager to perform advanced operations on the TravelPackage object without compromising the base profile’s restrictions. This setup exemplifies Salesforce's best practices in applying granular access through permission sets for scalable and secure system administration.
+![123](./ScreenshotDocumentation/Milestone25PermissionSet.PNG)
+
+## Milestone 26: Sharing Setting
+
+To strengthen data security and regulate access to customer information, I configured sharing settings for the `Customer_Info__c` object. The first step involved setting its organization-wide default (OWD) to **Private**, which limits access to record owners and users higher up in the role hierarchy. This ensures that sensitive customer data is not openly accessible to all users by default.
+
+To support cross-team visibility where necessary, I created a custom **sharing rule**. This rule automatically shares records owned by users assigned to the **Travel Agent** role with users in the **Tour Guide** role. The access level for this rule was set to **Read Only**, allowing tour guides to view customer details without the ability to modify them. This setup promotes secure collaboration by preserving data confidentiality while enabling relevant users to access the information they need.
+![123](./ScreenshotDocumentation/Milestone26SharingSetting.PNG)
+
+## Milestone 27: Test Classes
+
+To validate the automation logic behind the `BookingTrigger` and `BookingTriggerHandler`, I developed a dedicated Apex test class named `BookingTriggerTest`. This test class ensures that when a new `Booking__c` record is inserted, related `BookingPayment__c` and `BookingGuest__c` records are automatically generated with the appropriate values. The class not only verifies that the business logic executes correctly but also contributes to the required Apex test coverage for deployment.
+
+I accessed the Developer Console via the Setup menu in Salesforce and created a new Apex class named `BookingTriggerTest`. Within the test method, I first inserted a sample `Customer_Info__c` record with necessary fields, including `Date_of_Birth__c`. I then created a `TravelPackage__c` record and populated mandatory fields such as `Country__c`, `Price_Per_Person__c`, `Duration_in_Days__c`, and `Places_Covered__c`.
+
+Next, I inserted a `Booking__c` record, ensuring fields like `Number_of_Travelers__c`, `Booking_Status__c`, and `Booking_Date__c` were properly filled and linked to the previously created customer and travel package. The insertion was wrapped within `Test.startTest()` and `Test.stopTest()` to trigger the automation logic.
+
+After execution, I used queries and assertions to confirm that a corresponding `BookingPayment__c` record was created with a default status of "Pending" and that three `BookingGuest__c` records were generated, each properly named (e.g., “Guest 1”). The test passed successfully, confirming the correctness of the automation and meeting deployment readiness standards.
+![123](./ScreenshotDocumentation/Milestone27TestClasses.PNG)
+
+
+## Milestone 28: Preparing Test Cases & Fixing Defects
+
+To ensure the reliability and accuracy of the Tours & Travels CRM system, a set of structured test cases was developed and executed to verify core system functionality. One of the initial tests involved creating a new customer record by completing all required fields in the Customer object and saving the entry. A successful outcome would result in the new customer appearing in the customer list. Any failure was expected to stem from missing required fields or validation rule violations.
+
+Another test case focused on the booking process. The tester filled out all necessary details in the Booking object and saved the record. The system was expected to automatically generate a linked `BookingPayment__c` record with a default "Pending" status and populate `BookingGuest__c` records according to the number of travelers specified. Failures in this flow would typically be due to incomplete input data, validation constraints, or issues within the associated Apex automation logic.
+
+A final test case validated automation following a payment update. When the `Payment_Status__c` field in a booking payment was changed to "Completed", the corresponding booking was expected to update its status to "Confirmed" and send an email confirmation to the customer. If these behaviors did not execute, potential causes included misconfigured flows, issues in the Process Builder, or defects in the Apex trigger logic.
+
+These test scenarios helped verify that critical automations and business logic performed as intended, while also aiding in the identification and resolution of system defects before deployment.
+
+![123](./ScreenshotDocumentation/Milestone28PreparingTestCasesFixingDefects.PNG)
+
+## Milestone 29: Data Import Wizard
+
+To efficiently populate the Salesforce CRM with sample records, the Data Import Wizard was utilized to upload prepared CSV files for the `Customer_Info__c`, `TravelPackage__c`, and `Employee__c` objects. Each file included at least 20 entries with all required fields filled to ensure a smooth import process. The import began by logging in as an administrator, navigating to the Data Import Wizard via the Quick Find bar, and selecting the target object—such as Customer Info. The “Add new records” option was chosen, and the appropriate CSV file was uploaded.
+
+During field mapping, auto-mapped fields were carefully reviewed and adjusted where necessary to align with object field names and types. After confirming the mappings, the import was executed and progress was monitored through the Bulk Data Load Jobs section in Setup. The same procedure was repeated for the TravelPackage and Employee objects. After successful completion, imported records were reviewed to confirm correct field population. This milestone ensured that the CRM had a foundational dataset ready for testing, validation, and user interaction.
+![123](./ScreenshotDocumentation/Milestone29DataImportWizard.PNG)
+
+# Phase 5: Deployment, Documentation & Maintenance
+
+## Deployment Strategy
+To simulate a real deployment, a structured approach was followed using tools commonly applied in enterprise Salesforce environments. Change Sets were utilized to bundle and transfer metadata components such as objects, fields, workflows, validation rules, and approval processes from the sandbox to a simulated production environment. For unsupported components like Lightning Web Components (LWCs) and custom metadata, deployment was simulated using tools such as Salesforce DX and Workbench.
+
+In a real scenario, these deployments would be validated in a full sandbox environment before being released to production, ensuring error-free rollout and minimizing risks. Concepts such as CI/CD pipelines, Git versioning, and deployment rollback plans were also explored to simulate how enterprises maintain control over release cycles.
+
+## System Maintenance and Monitoring
+Post-deployment, the system's long-term stability relies on routine monitoring and proactive maintenance. Admins are responsible for overseeing:
+Automation performance (e.g., Flows, Apex Triggers, and Scheduled Jobs)
+System logs and error alerts to identify performance bottlenecks
+User permissions, profiles, and role hierarchies to ensure access security
+Field History Tracking and Audit Logs for monitoring data changes
+Periodic test coverage reviews, metadata backups, and performance assessments are conducted to support continuous reliability, security, and scalability. Regular feedback collection from users helps prioritize system refinements and usability improvements.
+
+
+## Troubleshooting Approach
+A systematic troubleshooting method was established to diagnose and resolve issues efficiently. When errors occur, such as automation failures or Apex exceptions, debug logs and system error messages are analyzed to identify the root cause. Issues are first replicated in a sandbox environment, where fixes are applied and tested before any changes are deployed. For major components, a rollback plan using metadata backups or earlier change sets ensures that fixes can be reverted safely if needed. This structured approach minimizes downtime and supports quick, accurate problem resolution.
+
+## Future Enhancements
+To keep the CRM aligned with evolving user needs and industry trends, several future improvements have been identified:
+AI-Powered Chatbot Integration: To handle customer inquiries, assist with bookings, and improve self-service capabilities.
+Smart Recommendations: Using AI and machine learning to suggest travel packages based on user preferences, booking history, and behavior patterns.
+Mobile Optimization & App Integration: Development of a mobile-friendly interface or native app to support on-the-go users, both agents and customers.
+External API Integration: Connecting the CRM to third-party services such as flight and hotel booking systems for a complete end-to-end travel experience.
+Predictive Analytics & Real-Time Dashboards: Introducing automated reporting, KPI tracking, and trend forecasting for data-driven decision-making.
+Customer Experience Features: Tools like loyalty program tracking, customer journey mapping, and automated feedback analysis using sentiment detection.
+Enhanced Security & Compliance: Implementing Two-Factor Authentication (2FA), configurable audit dashboards, and advanced access monitoring.
+Einstein AI Integration: Leveraging Salesforce's AI suite for intelligent lead scoring, workflow suggestions, and deeper insight into customer behavior.
+These enhancements aim to elevate the CRM into a smarter, more scalable, and future-ready platform equipped to handle the dynamic needs of the travel and tourism sector.
+
+
+# Conclusion
+The successful development of the Tours & Travels CRM on the Salesforce platform demonstrates how modern CRM solutions can effectively digitize and streamline the operations of a travel and tourism business. By integrating custom data models, automation workflows, dynamic interfaces, and secure user access controls, the system addresses real-world business needs, ranging from managing bookings and customer information to tracking payments and collecting feedback.
+Although the project was built within a Salesforce Developer Edition for educational purposes, it closely follows enterprise-grade implementation practices. From structured configuration and Apex logic to Lightning Web Components and data import strategies, the project mirrors the full lifecycle of CRM development, testing, and simulated deployment.
+The system now supports:
+Seamless data flow across departments
+Role-based experiences tailored to job functions
+Automation that reduces manual workload
+Real-time insights through dashboards and reports
+Combined with rigorous testing, detailed documentation, and a scalable design, the CRM provides a strong foundation for future deployment, ongoing maintenance, and potential enterprise-level enhancements. This project not only delivered a functional CRM solution, but it also reinforced best practices in cloud-based system development.
+
+## Key Takeaways
+Working on the Tours & Travels CRM as a capstone project has given me valuable, hands-on experience in building a real-world CRM system using Salesforce. It allowed me to explore multiple areas of the platform, from backend development to user interface customization, security modeling, and deployment simulation. Below are the key lessons I gained:
+1. Deepened Knowledge of the Salesforce Ecosystem
+Working with Salesforce firsthand gave me a solid understanding of how to develop customized business applications. I became proficient in creating custom objects and fields, defining validation rules, and setting up field dependencies that guide users in entering accurate and context-aware data. I also learned how to automate tasks and streamline operations using Flows, Workflow Rules, Process Builder, and Approval Processes, which are essential tools for reducing manual work and enforcing consistent business logic. On the programming side, I enhanced my skills in Apex, particularly in writing triggers, building modular classes, and using asynchronous Apex like Queueable and Schedulable jobs.
+2. Effective Data Management Practices
+This project taught me the importance of maintaining clean and trustworthy data within a CRM. I implemented tools like Field History Tracking to monitor changes, and Duplicate Rules and Matching Rules to prevent duplicate customer records. I also gained hands-on experience with the Data Import Wizard, which helped me understand how to upload and validate bulk data efficiently while resolving mapping errors through result logs.
+3. Understanding of User Access and Security
+I learned how to manage user permissions effectively by configuring Profiles, Roles, and Permission Sets. Designing a Role Hierarchy allowed me to control record visibility based on organizational structure, while Sharing Rules provided flexibility in granting cross-functional access where needed. These configurations helped me understand how to balance data security with collaboration.
+4. UI Design and Customization for Usability
+Creating an intuitive and role-based user experience was a key part of the project. I worked on customizing Lightning Apps, rearranging Page Layouts, and using Dynamic Forms to tailor record views based on field values. I also built a Lightning Web Component that allows dynamic filtering of travel packages—an experience that showed me how custom components can enhance both interactivity and efficiency.
+5. Approach to Testing and Debugging
+Testing was a major focus of the project. I created Apex Test Classes to confirm that my backend logic worked as intended and that automation ran smoothly. I also wrote and executed manual test cases to validate user flows and record creation. Debugging involved analyzing logs, resolving field errors, and making sure that the system functioned reliably across different roles and data conditions.
+6. Project Planning and Documentation Discipline
+This experience helped me appreciate the value of organized planning and clear documentation. From gathering requirements and defining objectives to implementing configurations and recording testing results, I learned how to manage each phase of a Salesforce project. Simulating deployment through Change Sets and exploring enterprise practices like version control and backup strategies gave me a deeper understanding of how CRM systems are maintained and improved over time.
 
 
 
